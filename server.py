@@ -53,8 +53,10 @@ def GetCmd(url:str,hostname):
                 "--external-downloader", "aria2c",
                 "--no-playlist",
                 url]
-    if 'youtube' in hostname or 'xnxx' in hostname or 'xvideos' in hostname:
+    if 'xnxx' in hostname or 'xvideos' in hostname:
         cmd.append(["--proxy=127.0.0.1:1081"])
+    elif 'youtube' in hostname :
+        cmd.append(["--proxy=127.0.0.1:8000"])
     return cmd
 
 class HTTPHandler(http.server.BaseHTTPRequestHandler):
