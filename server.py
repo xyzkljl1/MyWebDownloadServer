@@ -43,6 +43,7 @@ def Processor():
             _, stderr = p.communicate()
             if p.returncode != 0:
                 print('Fail',id,stderr,stderr.decode(locale.getpreferredencoding()))
+                database.UpdateRow(id,stderr.decode(locale.getpreferredencoding()))
             else:
                 database.RemoveRow(id)
                 print('Success', id)

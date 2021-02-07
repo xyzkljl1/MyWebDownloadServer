@@ -7,7 +7,7 @@ def GetQueue():
     try:
         conn=_Connect()
         cursor=conn.cursor()
-        cursor.execute("select Id,URL from queue")
+        cursor.execute("select Id,URL from queue where FailCount<20")
         for (id,url) in cursor:
             queue.append((id,url))
         cursor.close()
@@ -24,6 +24,16 @@ def InsertURL(url:str):
         conn.close()
     except mysql.connector.Error as err:
         print("Fail To Add Task to Queue:", err)
+
+def UpdateRow(id:int,message:str):
+    try:
+        conn = _Connect()
+        conn.cmd_query("update queue set FailCount=FailCount+1,FailMessage='{0}' where id={1}".format(message,id))
+        conn.commit()
+        conn.close()
+    except mysql.connector.Error as err:
+        print("Fail To Update Row:", err)
+
 
 def RemoveRow(id:int):
     try:
