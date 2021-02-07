@@ -28,7 +28,8 @@ def InsertURL(url:str):
 def UpdateRow(id:int,message:str):
     try:
         conn = _Connect()
-        conn.cmd_query("update queue set FailCount=FailCount+1,FailMessage='{0}' where id={1}".format(message,id))
+        tmp=message.replace("'","\\'").replace('"','\\"').replace("{","{{").replace("}","}}")
+        conn.cmd_query("update queue set FailCount=FailCount+1,FailMessage='{0}' where id={1}".format(tmp,id))
         conn.commit()
         conn.close()
     except mysql.connector.Error as err:
