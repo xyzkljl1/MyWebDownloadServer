@@ -9,7 +9,7 @@ import locale
 import _thread
 sys.path.append('./lib/')
 import youtube_dl
-download_dir="D:/VideoDownload/"
+download_dir="E:/VideoDownload/"
 
 def Run():
     http_server=http.server.HTTPServer(('localhost',4000),HTTPHandler)
@@ -54,8 +54,8 @@ def GetCmd(url:str,hostname):
                 "--external-downloader", "aria2c",
                 "--no-playlist",
                 url]
-    if 'xnxx' in hostname or 'xvideos' in hostname:
-        cmd.append(["--proxy=127.0.0.1:1081"])
+    if 'xnxx' in hostname or 'xvideos' in hostname or 'pornhub' in hostname:
+        cmd.append(["--proxy=127.0.0.1:1196"])
     elif 'youtube' in hostname :
         cmd.append(["--proxy=127.0.0.1:8000"])
     return cmd
