@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- 主机:                           127.0.0.1
--- 服务器版本:                        8.0.17 - MySQL Community Server - GPL
--- 服务器OS:                        Win64
--- HeidiSQL 版本:                  10.2.0.5599
+-- Host:                         127.0.0.1
+-- Server version:               8.0.17 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             10.2.0.5599
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -13,18 +13,21 @@
 
 
 -- Dumping database structure for youtubedl
+DROP DATABASE IF EXISTS `youtubedl`;
 CREATE DATABASE IF NOT EXISTS `youtubedl` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `youtubedl`;
 
 -- Dumping structure for table youtubedl.queue
+DROP TABLE IF EXISTS `queue`;
 CREATE TABLE IF NOT EXISTS `queue` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `URL` varchar(500) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `Cookie` varchar(2000) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
   `UpdateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `FailCount` int(10) unsigned NOT NULL DEFAULT '0',
   `FailMessage` varchar(10000) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=305 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=412 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- Data exporting was unselected.
 
