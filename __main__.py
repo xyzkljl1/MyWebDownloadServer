@@ -1,8 +1,8 @@
 # coding: utf-8
 import io
 import sys
-#sys.stdout.reconfigure(encoding='gb18030')#IDE调试
-sys.stdout.reconfigure(encoding='utf-8')#直接运行
+sys.stdout.reconfigure(encoding='gb18030')#IDE调试、间接调用
+#sys.stdout.reconfigure(encoding='utf-8')#Terminal运行
 import my_server
 if __name__ == '__main__':
     # print(sys.getdefaultencoding())
