@@ -38,7 +38,7 @@ def Download(url,hostname,cookie,dir,proxy_a,proxy_b):
         for p in parser.data:
             img_url="https://telegra.ph"+p
             ext=os.path.splitext(p)[1]
-            filename=str(ct)+ext
+            filename=str(ct).zfill(4)+ext
             cmd = ["aria2c.exe",img_url,
                    "--dir",sub_dir,
                    "--all-proxy",proxy_a,
