@@ -8,6 +8,7 @@ import database
 import _thread
 import downloader_youtubedl
 import downloader_nhentai
+import downloader_telegra
 
 PROXY_A="127.0.0.1:1196"
 PROXY_B="127.0.0.1:8000"
@@ -28,6 +29,9 @@ def Processor():
             if "nhentai" in res.hostname:
                 dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
                 success,msg=downloader_nhentai.Download(url,res.hostname,cookie,dir,PROXY_A,PROXY_B)
+            if "telegra.ph" in res.hostname:
+                dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
+                success, msg = downloader_telegra.Download(url, res.hostname, cookie, dir, PROXY_A, PROXY_B)
             else:
                 dir = os.path.join("E:/VideoDownload/", res.hostname.split('.')[-2])
                 success,msg=downloader_youtubedl.Download(url,res.hostname,cookie,dir,PROXY_A,PROXY_B)
