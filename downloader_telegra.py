@@ -36,7 +36,11 @@ def Download(url,hostname,cookie,dir,proxy_a,proxy_b):
         ct=1
         sub_dir=os.path.join(dir,id)
         for p in parser.data:
-            img_url="https://telegra.ph"+p
+            #有站内路径和站外路径两种
+            if p.startswith("http://") or p.startswith("https://"):
+                img_url=p
+            else:
+                img_url="https://telegra.ph"+p
             ext=os.path.splitext(p)[1]
             filename=str(ct).zfill(4)+ext
             cmd = ["aria2c.exe",img_url,
@@ -46,10 +50,10 @@ def Download(url,hostname,cookie,dir,proxy_a,proxy_b):
                    "--allow-overwrite=true"
                    ]
             print("Start Download ",img_url)
-            p = subprocess.Popen(
+            process = subprocess.Popen(
                 cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-            _, stderr = p.communicate()
-            if p.returncode != 0:
+            _, stderr = process.communicate()
+            if process.returncode != 0:
                 print('Fail', stderr, stderr.decode(locale.getpreferredencoding()))
                 return False, stderr.decode(locale.getpreferredencoding())
             else:
