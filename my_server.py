@@ -61,3 +61,5 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
         if res.scheme!='http' and res.scheme!='https':
             return
         database.InsertURL(url,cookie)
+        self.send_response(200)
+        self.end_headers()
