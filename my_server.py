@@ -58,10 +58,7 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
             cookie=urllib.parse.unquote(text['cookie'][0])
         else:
             cookie=''
-        if text.__contains__('useragent'):
-            useragent=urllib.parse.unquote(text['useragent'][0])
-        else:
-            useragent=''
+        useragent=self.headers.get('user-agent')
         res=urllib.parse.urlparse(url)
         if res.scheme!='http' and res.scheme!='https':
             return
