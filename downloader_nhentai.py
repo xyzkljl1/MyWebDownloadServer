@@ -5,13 +5,13 @@ import lib.nhentai
 import lib.nhentai.command
 
 
-def Download(url,hostname,cookie,dir,proxy_a,proxy_b):
+def Download(url, hostname, cookie, useragent, dir,proxy_a,proxy_b):
     if not os.path.exists(dir):
         os.makedirs(dir)
     try:
         res=urllib.parse.urlparse(url)
         id=res.path.split('/')[2]
-        lib.nhentai.command.main(proxy_a,cookie,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",["--id="+id,"--format","[%a](%i)%s","-o",dir,"--no-html"])
+        lib.nhentai.command.main(proxy_a, cookie, useragent, ["--id="+id, "--format", "[%a](%i)%s", "-o", dir, "--no-html"])
         return True,""
     except Exception as e:
         import traceback

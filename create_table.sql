@@ -13,12 +13,10 @@
 
 
 -- Dumping database structure for youtubedl
-DROP DATABASE IF EXISTS `youtubedl`;
 CREATE DATABASE IF NOT EXISTS `youtubedl` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `youtubedl`;
 
 -- Dumping structure for table youtubedl.queue
-DROP TABLE IF EXISTS `queue`;
 CREATE TABLE IF NOT EXISTS `queue` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `URL` varchar(500) COLLATE utf8_bin NOT NULL DEFAULT '',
@@ -26,8 +24,9 @@ CREATE TABLE IF NOT EXISTS `queue` (
   `UpdateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `FailCount` int(10) unsigned NOT NULL DEFAULT '0',
   `FailMessage` varchar(10000) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
+  `UserAgent` varchar(1000) COLLATE utf8_bin NOT NULL DEFAULT '',
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=412 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=725 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- Data exporting was unselected.
 

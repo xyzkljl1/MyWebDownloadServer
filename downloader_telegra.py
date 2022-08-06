@@ -20,7 +20,7 @@ class MyHTMLParser(html.parser.HTMLParser):
                     self.data.append(pair[1])
 
 
-def Download(url,hostname,cookie,dir,proxy_a,proxy_b):
+def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
     if not os.path.exists(dir):
         os.makedirs(dir)
     try:

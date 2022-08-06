@@ -7,19 +7,19 @@ def GetQueue():
     try:
         conn=_Connect()
         cursor=conn.cursor()
-        cursor.execute("select Id,URL,Cookie from queue where FailCount<20")
-        for (id,url,cookie) in cursor:
-            queue.append((id,url,cookie))
+        cursor.execute("select Id,URL,Cookie,UserAgent from queue where FailCount<20")
+        for (id,url,cookie,useragent) in cursor:
+            queue.append((id,url,cookie,useragent))
         cursor.close()
         conn.close()
     except mysql.connector.Error as err:
         print("Fail To Get Queue:", err)
     return queue
 
-def InsertURL(url:str,cookie:str):
+def InsertURL(url:str,cookie:str,useragent:str):
     try:
         conn = _Connect()
-        conn.cmd_query("insert into queue(URL,Cookie) values('{0}','{1}') ".format(url,cookie))
+        conn.cmd_query("insert into queue(URL,Cookie,UserAgent) values('{0}','{1}','{2}') ".format(url,cookie,useragent))
         conn.commit()
         conn.close()
     except mysql.connector.Error as err:

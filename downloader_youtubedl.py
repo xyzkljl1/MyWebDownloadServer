@@ -4,7 +4,7 @@ import subprocess
 import locale
 
 
-def Download(url,hostname,cookie,dir,proxy_a,proxy_b):
+def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
     if not os.path.exists(dir):
         os.makedirs(dir)
     # download
