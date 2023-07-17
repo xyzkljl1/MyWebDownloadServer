@@ -49,6 +49,8 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
             if not url.startswith('https://cosplaytele.com'):
                 download_page_url=url
                 break
+        if download_page_url is None:
+            return False,"Cant find download page"
         if 'mediafire.com' in download_page_url:
             # 从mediafire下载压缩包
             download_page = str(requests.get(download_page_url).content)
