@@ -45,6 +45,7 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
         password='cosplaytele'
         #获取第三方下载页
         download_page_url_list = tree.xpath('//*[@class="fas fa-download"]/../../..//a/@href')
+        download_page_url=None
         for url in download_page_url_list:
             if not url.startswith('https://cosplaytele.com'):
                 download_page_url=url
