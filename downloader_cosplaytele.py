@@ -66,8 +66,7 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
             if process.returncode != 0:
                 print('Fail', stderr, stderr.decode(locale.getpreferredencoding()))
                 return False, stderr.decode(locale.getpreferredencoding())
-            else:
-                print('Done')
+            print('Download Done')
             #解压
             sub_dir = os.path.join(dir, title)
             #7z的选项和参数间没有空格
@@ -77,7 +76,6 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
                    "-aos",#跳过已有文件
                    "-o"+sub_dir#路径里有空格不影响
                    ]
-            print("Start Extract")
             process = subprocess.Popen(
                 cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
             stdout, stderr = process.communicate()
@@ -88,6 +86,7 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
                 print('Fail', stdout, stdout.decode(locale.getpreferredencoding()))
                 return False, "Extract None Files"
             os.remove(filepath)
+            print('All Done')
             return True, ""
         else:
             return False,"Unknow Download Web:"+download_url
