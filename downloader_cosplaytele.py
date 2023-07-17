@@ -35,7 +35,7 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
         #if id=='':
         #    id="empty"
         #获取页面
-        page=str(requests.get(url).content)
+        page=str(requests.get(url,proxies={"http":proxy_a,"https":proxy_a}).content)
         tree = etree.HTML(page)
         title = tree.xpath('//h1[@class="entry-title"]/text()')[0]
         pat = re.compile(r'(\\x[0-9a-fA-F][0-9a-fA-F])+')
@@ -44,7 +44,11 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
         #密码似乎是固定的
         password='cosplaytele'
         #获取第三方下载页
-        download_page_url = tree.xpath('//*[@class="fas fa-download"]/../../..//a/@href')[2]
+        download_page_url_list = tree.xpath('//*[@class="fas fa-download"]/../../..//a/@href')
+        for url in download_page_url_list:
+            if not url.startswith('https://cosplaytele.com'):
+                download_page_url=url
+                break
         if 'mediafire.com' in download_page_url:
             # 从mediafire下载压缩包
             download_page = str(requests.get(download_page_url).content)
@@ -54,7 +58,7 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
             filepath = os.path.join(tmp_dir,filename)
             cmd = ["aria2c.exe", download_url,
                    "--dir", tmp_dir,
-                   #"--all-proxy", proxy_b,
+                   "--all-proxy", proxy_b,
                    "--out", filename,
                    "--allow-overwrite=true",
                    "--split",'20',
@@ -88,8 +92,11 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
             os.remove(filepath)
             print('All Done')
             return True, ""
+        elif 'terabox.com' in download_page_url:
+            #TO DO
+            return False,"Unknow Download Web:"+download_page_url
         else:
-            return False,"Unknow Download Web:"+download_url
+            return False,"Unknow Download Web:"+download_page_url
     except Exception as e:
         import traceback
         traceback.print_stack()
