@@ -35,7 +35,7 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
         #if id=='':
         #    id="empty"
         #获取页面
-        page=str(requests.get(url,proxies={"http":proxy_a,"https":proxy_a}).content)
+        page=str(requests.get(url).content)
         tree = etree.HTML(page)
         title = tree.xpath('//h1[@class="entry-title"]/text()')[0]
         pat = re.compile(r'(\\x[0-9a-fA-F][0-9a-fA-F])+')
@@ -44,7 +44,7 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
         #密码似乎是固定的
         password='cosplaytele'
         #获取第三方下载页
-        download_page_url_list = tree.xpath('//*[@class="fas fa-download"]/../../..//a/@href')
+        download_page_url_list = tree.xpath('//*[@class="entry-content single-page"]//a/@href')
         download_page_url=None
         for url in download_page_url_list:
             if not url.startswith('https://cosplaytele.com'):
@@ -54,17 +54,26 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
             return False,"Cant find download page"
         if 'mediafire.com' in download_page_url:
             # 从mediafire下载压缩包
+            # 获取下载页
             download_page = str(requests.get(download_page_url).content)
+            # 获取真实链接
             tree = etree.HTML(download_page)
-            download_url = str(tree.xpath('//a[@aria-label="Download file"]/@href')[0])
+            if len(tree.xpath('//a[@aria-label="Download file"]/@href')) == 0: #有点击按钮下载和自动下载两种格式的页面
+                if len(tree.xpath('//a[@aria-labelledby="copy-tooltip"]/@href')) == 0:
+                    return False, "Broken download page"
+                else:
+                    download_url = str(tree.xpath('//a[@aria-labelledby="copy-tooltip"]/@href')[0])
+            else:
+                download_url = str(tree.xpath('//a[@aria-label="Download file"]/@href')[0])
+            # 获取下载页和实际下载需要使用同样的代理，否则下载链接可能被重定向到另一个下载页
             filename = title + ".rar"  # 似乎固定是rar
             filepath = os.path.join(tmp_dir,filename)
             cmd = ["aria2c.exe", download_url,
                    "--dir", tmp_dir,
-                   "--all-proxy", proxy_b,
+                   #"--all-proxy", proxy_a,
                    "--out", filename,
                    "--allow-overwrite=true",
-                   "--split",'20',
+                   #"--split",'20',
                    ]
             print("Start Download ", download_url)
             process = subprocess.Popen(
