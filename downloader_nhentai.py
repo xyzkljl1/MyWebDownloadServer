@@ -11,7 +11,7 @@ def Download(url, hostname, cookie, useragent, dir,proxy_a,proxy_b):
     try:
         res=urllib.parse.urlparse(url)
         id=res.path.split('/')[2]
-        lib.nhentai.command.main(proxy_a, cookie, useragent, ["--id="+id, "--format", "[%a](%i)%s", "-o", dir, "--no-html"])
+        lib.nhentai.command.main(proxy_a, cookie, useragent, ["--id",id, "--format", "[%a](%i)%s", "-o", dir, "--no-html"])
         return True,""
     except Exception as e:
         import traceback
