@@ -4,11 +4,11 @@ import subprocess
 import locale
 
 
-def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
+def Download(url, hostname, cookie, useragent, dir, proxy_a, proxy_b, id):
     if not os.path.exists(dir):
         os.makedirs(dir)
     # download
-    cmd = GetCmd(url, hostname,proxy_a,proxy_b)
+    cmd = GetCmd(url, hostname, proxy_a, proxy_b)
     cmd.append(["-o", "\"{0}/%(title)s[{1}].%(ext)s\"".format(dir, id)])
     """
     ！！：需要在pycharm的setting的File Encodings里把encoding设置成System Default

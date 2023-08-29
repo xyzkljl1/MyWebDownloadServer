@@ -39,7 +39,7 @@ def Processor():
                 success, msg = downloader_cosplaytele.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
             else:
                 dir = os.path.join("E:/VideoDownload/", res.hostname.split('.')[-2])
-                success,msg=downloader_youtubedl.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
+                success,msg=downloader_youtubedl.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, id)
             if success:
                 database.RemoveRow(id)
             else:
