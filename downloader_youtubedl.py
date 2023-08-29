@@ -2,14 +2,13 @@
 import os,sys
 import subprocess
 import locale
-
+import re
 
 def Download(url, hostname, cookie, useragent, dir, proxy_a, proxy_b, id):
     if not os.path.exists(dir):
         os.makedirs(dir)
     # download
-    cmd = GetCmd(url, hostname, proxy_a, proxy_b)
-    cmd.append(["-o", "\"{0}/%(title)s[{1}].%(ext)s\"".format(dir, id)])
+    cmd = GetCmd(url, hostname, proxy_a, proxy_b, dir, id)
     """
     ！！：需要在pycharm的setting的File Encodings里把encoding设置成System Default
     不设置Popen的encoding时返回bytes，设置后返回str，但是实际上只是对bytes做了decode而已，并不会更改进程实际返回的内容，设置的encoding不正确时会抛出异常
@@ -26,7 +25,7 @@ def Download(url, hostname, cookie, useragent, dir, proxy_a, proxy_b, id):
         print('Success', id)
         return True,""
 
-def GetCmd(url:str,hostname,proxy_a,proxy_b):
+def GetCmd(url:str,hostname,proxy_a,proxy_b, dir, id):
     cmd = ["python", "./lib/youtube_dl/__main__.py",
                 "--external-downloader", "aria2c",
                 "--no-playlist",
@@ -34,5 +33,13 @@ def GetCmd(url:str,hostname,proxy_a,proxy_b):
     if 'xnxx' in hostname or 'xvideos' in hostname or 'pornhub' in hostname:
         cmd.append(["--proxy="+proxy_a])
     elif 'youtube' in hostname :
-        cmd.append(["--proxy="+proxy_b])
+        cmd.append(["--proxy="+proxy_a])
+    if 'bilibili' in hostname :
+        #分P视频
+        if re.search(r'\\?p=\d+',url) is not None:
+            cmd.append(["-o", "\"{0}/%(title)s P%(sub_index)s %(sub_title)s[{1}].%(ext)s\"".format(dir, id)])
+        else:
+            cmd.append(["-o", "\"{0}/%(title)s[{1}].%(ext)s\"".format(dir, id)])
+    else:
+        cmd.append(["-o", "\"{0}/%(title)s[{1}].%(ext)s\"".format(dir, id)])
     return cmd

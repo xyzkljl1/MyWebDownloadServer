@@ -127,6 +127,8 @@ class BiliBiliIE(InfoExtractor):
         video_id = mobj.group('id') or mobj.group('id_bv')
         anime_id = mobj.group('anime_id')
         webpage = self._download_webpage(url, video_id)
+        sub_title=None
+        sub_index=None
 
         if 'anime/' not in url:
             cid = self._search_regex(
@@ -137,6 +139,18 @@ class BiliBiliIE(InfoExtractor):
                  r'EmbedPlayer\([^)]+,\s*\\"([^"]+)\\"\)',
                  r'<iframe[^>]+src="https://secure\.bilibili\.com/secure,([^"]+)"'],
                 webpage, 'player parameters'))['cid'][0]
+            #myfix: fixed multi-part video,ref:https://github.com/ytdl-org/youtube-dl/issues/31051
+            if '?p=' in url:
+                cid = self._search_regex(
+                    r'https.*(\d{9,}).*m4s', webpage, 'cid',
+                    default=None)
+                sub_title = self._search_regex(
+                    r'"cid":1{0,1}%s.*?"part":"(.*?[^\\])"' % cid, webpage, 'sub_title',
+                    default=None)
+                sub_index = self._search_regex(
+                    r'"cid":1{0,1}%s.*?"page":(\d+)' % cid, webpage, 'sub_index',
+                    default=None)
+            #myfix end
         else:
             if 'no_bangumi_tip' not in smuggled_data:
                 self.to_screen('Downloading episode %s. To download all videos in anime %s, re-run youtube-dl with %s' % (
@@ -222,6 +236,8 @@ class BiliBiliIE(InfoExtractor):
         info = {
             'id': video_id,
             'title': title,
+            'sub_title': sub_title,
+            'sub_index': sub_index,
             'description': description,
             'timestamp': timestamp,
             'thumbnail': thumbnail,
