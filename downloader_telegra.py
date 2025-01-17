@@ -29,7 +29,9 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
         id=re.sub('[\/:*?"<>|]','_',id)
         if id=='':
             id="empty"
-        page=str(requests.get(url,proxies={"http":proxy_a,"https":proxy_a}).content)
+        tmp=requests.get(url,proxies={"http":proxy_a,"https":proxy_a})
+        tmp=tmp.content
+        page=str(tmp)
         parser=MyHTMLParser()
         parser.feed(page)
         parser.close()
@@ -47,7 +49,8 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
                    "--dir",sub_dir,
                    "--all-proxy",proxy_a,
                    "--out",filename,
-                   "--allow-overwrite=true"
+                   "--allow-overwrite=true",
+                   "--check-certificate=false"
                    ]
             print("Start Download ",img_url)
             process = subprocess.Popen(

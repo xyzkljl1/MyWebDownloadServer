@@ -32,10 +32,11 @@ def Processor():
                 dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
                 success,msg=downloader_nhentai.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
             elif "telegra.ph" in res.hostname:
-                dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
+                dir = "G:/DL_Pic/telegram_auto/org/"
+                #dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
                 success, msg = downloader_telegra.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
             elif "cosplaytele.com" in res.hostname:
-                dir = "G:/DL_Pic/telegra/"
+                dir = "G:/DL_Pic/telegram_auto/org/"
                 success, msg = downloader_cosplaytele.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
             else:
                 dir = os.path.join("E:/VideoDownload/", res.hostname.split('.')[-2])
