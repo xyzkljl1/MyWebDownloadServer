@@ -33,7 +33,9 @@ def GetCmd(url:str,hostname,proxy_a,proxy_b, dir, id):
     cmd = [".\yt-dlp.exe",
             url,
            "-o",f"{dir}\\%(title)s.%(ext)s",
-           "--no-playlist"]
+           "--no-playlist",
+           # 要使用yt-dlp构建的ffmpeg See https://github.com/yt-dlp/yt-dlp Readme Strongly recommended部分
+           "--ffmpeg-location","ffmpeg.exe"]
     if 'xnxx' in hostname or 'xvideos' in hostname or 'pornhub' in hostname:
         cmd.extend(["--proxy",proxy_a])
     elif 'youtube' in hostname :
