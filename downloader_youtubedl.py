@@ -16,10 +16,10 @@ def Download(url, hostname, cookie, useragent, dir, proxy_a, proxy_b, id):
     为了避免代码随IDE配置变化，只能将其设为System Default
     """
     p = subprocess.Popen(cmd)#, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-    _, stderr = p.communicate()
+    p.communicate()
     if p.returncode != 0:
-        print('Fail', id, stderr, stderr.decode(locale.getpreferredencoding()))
-        return False,stderr.decode(locale.getpreferredencoding())
+        print('Fail', id)
+        return False, "download fail"
     else:
         print('Success', id)
         return True,""
