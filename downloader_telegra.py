@@ -55,9 +55,10 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
             print("Start Download ",img_url)
             process = subprocess.Popen(
                 cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-            _, stderr = process.communicate()
+            stdout, stderr = process.communicate()
             if process.returncode != 0:
-                print('Fail', stderr, stderr.decode(locale.getpreferredencoding()))
+                # 有时候就是图床挂了或图片过期
+                print('Fail on ', img_url, stdout, stderr, stderr.decode(locale.getpreferredencoding()))
                 return False, stderr.decode(locale.getpreferredencoding())
             else:
                 print('Done')
