@@ -24,7 +24,7 @@ def Processor():
     while True:
         queue=database.GetQueue()
 
-        for (id,url,cookie,useragent) in queue:
+        for (id, url, cookie, useragent) in queue:
             print('Try Start Task {0}:{1}'.format(id,url))
             res = urllib.parse.urlparse(url)
 

@@ -6,7 +6,7 @@ import requests
 import html.parser
 import locale
 import subprocess
-
+import PIL as Image
 
 class MyHTMLParser(html.parser.HTMLParser):
     def __init__(self):
@@ -40,19 +40,19 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
         for p in parser.data:
             #有站内路径和站外路径两种
             if p.startswith("http://") or p.startswith("https://"):
-                img_url=p
+                img_url = p
             else:
-                img_url="https://telegra.ph"+p
-            ext=os.path.splitext(p)[1]
-            filename=str(ct).zfill(4)+ext
-            cmd = ["aria2c.exe",img_url,
-                   "--dir",sub_dir,
-                   "--all-proxy",proxy_a,
-                   "--out",filename,
+                img_url = "https://telegra.ph"+p
+            ext = os.path.splitext(p)[1]
+            filename = str(ct).zfill(4)+ext
+            cmd = ["aria2c.exe", img_url,
+                   "--dir", sub_dir,
+                   "--all-proxy", proxy_a,
+                   "--out", filename,
                    "--allow-overwrite=true",
                    "--check-certificate=false"
                    ]
-            print("Start Download ",img_url)
+            print("Start Download ", img_url)
             process = subprocess.Popen(
                 cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
             stdout, stderr = process.communicate()
@@ -62,6 +62,12 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
                 return False, stderr.decode(locale.getpreferredencoding())
             else:
                 print('Done')
+            if ext == ".webp":
+                img = Image.open(os.path.join(sub_dir, filename))
+                img.save(os.path.join(sub_dir, filename + ".png"), "PNG")
+                img.close()
+                os.remove(os.path.join(sub_dir, filename))
+                print('Convert webp to png')
             ct+=1
         print("All Done",ct-1)
         return True,""
