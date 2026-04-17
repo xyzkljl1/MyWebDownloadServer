@@ -6,7 +6,7 @@ import requests
 import html.parser
 import locale
 import subprocess
-import PIL as Image
+from PIL import Image
 
 class MyHTMLParser(html.parser.HTMLParser):
     def __init__(self):
