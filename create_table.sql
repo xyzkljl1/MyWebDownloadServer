@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `queue` (
   `FailCount` int(10) unsigned NOT NULL DEFAULT '0',
   `FailMessage` varchar(10000) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
   `UserAgent` varchar(1000) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `IgnoreError` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=725 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 

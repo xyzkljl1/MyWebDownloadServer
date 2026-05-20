@@ -7,9 +7,9 @@ def GetQueue():
     try:
         conn=_Connect()
         cursor=conn.cursor()
-        cursor.execute("select Id,URL,Cookie,UserAgent from queue where FailCount<20")
-        for (id,url,cookie,useragent) in cursor:
-            queue.append((id,url,cookie,useragent))
+        cursor.execute("select Id,URL,Cookie,UserAgent,IgnoreError from queue where FailCount<20")
+        for (id,url,cookie,useragent,ignore_error) in cursor:
+            queue.append((id,url,cookie,useragent,ignore_error))
         cursor.close()
         conn.close()
     except mysql.connector.Error as err:

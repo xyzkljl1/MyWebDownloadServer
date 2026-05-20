@@ -130,3 +130,10 @@ dmypy.json
 
 #cookie
 www.*_cookies.txt
+
+# IDE
+.idea/
+.vscode/
+
+# Local scratch files
+/test.py

@@ -24,7 +24,7 @@ def Processor():
     while True:
         queue=database.GetQueue()
 
-        for (id, url, cookie, useragent) in queue:
+        for (id, url, cookie, useragent, ignore_error) in queue:
             print('Try Start Task {0}:{1}'.format(id,url))
             res = urllib.parse.urlparse(url)
 
@@ -34,7 +34,7 @@ def Processor():
             elif "telegra.ph" in res.hostname:
                 dir = "G:/DL_Pic/telegram_auto/org/"
                 #dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
-                success, msg = downloader_telegra.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
+                success, msg = downloader_telegra.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, ignore_error)
             elif "cosplaytele.com" in res.hostname:
                 dir = "G:/DL_Pic/telegram_auto/org/"
                 success, msg = downloader_cosplaytele.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)

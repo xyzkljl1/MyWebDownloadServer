@@ -20,7 +20,7 @@ class MyHTMLParser(html.parser.HTMLParser):
                     self.data.append(pair[1])
 
 
-def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
+def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b,ignore_error=False):
     if not os.path.exists(dir):
         os.makedirs(dir)
     try:
@@ -58,8 +58,12 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
             stdout, stderr = process.communicate()
             if process.returncode != 0:
                 # 有时候就是图床挂了或图片过期
-                print('Fail on ', img_url, stdout, stderr, stderr.decode(locale.getpreferredencoding()))
-                return False, stderr.decode(locale.getpreferredencoding())
+                msg=stderr.decode(locale.getpreferredencoding())
+                print('Fail on ', img_url, stdout, stderr, msg)
+                if not ignore_error:
+                    return False, msg
+                ct+=1
+                continue
             else:
                 print('Done')
             if ext == ".webp":
