@@ -25,25 +25,30 @@ def Processor():
         queue=database.GetQueue()
 
         for (id, url, cookie, useragent, ignore_error) in queue:
-            print('Try Start Task {0}:{1}'.format(id,url))
-            res = urllib.parse.urlparse(url)
+            try:
+                print('Try Start Task {0}:{1}'.format(id,url))
+                res = urllib.parse.urlparse(url)
 
-            if "nhentai" in res.hostname:
-                dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
-                success,msg=downloader_nhentai.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
-            elif "telegra.ph" in res.hostname:
-                dir = "G:/DL_Pic/telegram_auto/org/"
-                #dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
-                success, msg = downloader_telegra.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, ignore_error)
-            elif "cosplaytele.com" in res.hostname:
-                dir = "G:/DL_Pic/telegram_auto/org/"
-                success, msg = downloader_cosplaytele.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
-            else:
-                dir = os.path.join("E:/VideoDownload/", res.hostname.split('.')[-2])
-                success,msg=downloader_youtubedl.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, id)
-            if success:
-                database.RemoveRow(id)
-            else:
+                if "nhentai" in res.hostname:
+                    dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
+                    success,msg=downloader_nhentai.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
+                elif "telegra.ph" in res.hostname:
+                    dir = "G:/DL_Pic/telegram_auto/org/"
+                    #dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
+                    success, msg = downloader_telegra.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, ignore_error)
+                elif "cosplaytele.com" in res.hostname:
+                    dir = "G:/DL_Pic/telegram_auto/org/"
+                    success, msg = downloader_cosplaytele.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
+                else:
+                    dir = os.path.join("E:/VideoDownload/", res.hostname.split('.')[-2])
+                    success,msg=downloader_youtubedl.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, id)
+                if success:
+                    database.RemoveRow(id)
+                else:
+                    database.UpdateRow(id,msg)
+            except Exception as e:
+                msg = f"{type(e).__name__}: {e}"
+                print('Task failed {0}:{1} {2}'.format(id,url,msg))
                 database.UpdateRow(id,msg)
         time.sleep(30)
 

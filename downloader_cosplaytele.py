@@ -111,6 +111,6 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
         else:
             return False,"Unknow Download Web:"+download_page_url
     except Exception as e:
-        import traceback
-        traceback.print_stack()
-        return False,str(e)
+        msg = f"{type(e).__name__}: {e}"
+        print("Download failed:", msg)
+        return False,msg
