@@ -36,6 +36,7 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b,ignore_error=Fal
         parser.feed(page)
         parser.close()
         ct=1
+        fail_ct = 0
         sub_dir=os.path.join(dir,id)
         for p in parser.data:
             #有站内路径和站外路径两种
@@ -60,8 +61,7 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b,ignore_error=Fal
                 # 有时候就是图床挂了或图片过期
                 msg=stderr.decode(locale.getpreferredencoding())
                 print('Fail on ', img_url, stdout, stderr, msg)
-                if not ignore_error:
-                    return False, msg
+                fail_ct += 1
                 ct+=1
                 continue
             else:
@@ -73,8 +73,14 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b,ignore_error=Fal
                 os.remove(os.path.join(sub_dir, filename))
                 print('Convert webp to png')
             ct+=1
-        print("All Done",ct-1)
-        return True,""
+        if ignore_error or fail_ct == 0:
+            print("All Done", ct-1)
+            return True, ""
+        elif ct > 0 and fail_ct < ct / 10:
+            print("Almost Done", ct - 1 - fail_ct, ct - 1)
+            return True, ""
+        else:
+            return False,  f"Fail:{fail_ct}/{ct - 1} " + msg
     except Exception as e:
         import traceback
         traceback.print_stack()
