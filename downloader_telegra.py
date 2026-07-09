@@ -6,6 +6,7 @@ import requests
 import html.parser
 import locale
 import subprocess
+import subprocess_cleanup
 from PIL import Image
 
 class MyHTMLParser(html.parser.HTMLParser):
@@ -54,7 +55,7 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b,ignore_error=Fal
                    "--check-certificate=false"
                    ]
             print("Start Download ", img_url)
-            process = subprocess.Popen(
+            process = subprocess_cleanup.popen_in_cleanup_job(
                 cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
             stdout, stderr = process.communicate()
             if process.returncode != 0:

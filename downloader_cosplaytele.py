@@ -6,6 +6,7 @@ import requests
 from lxml import etree
 import locale
 import subprocess
+import subprocess_cleanup
 import re
 
 def unicodetostr( s ):
@@ -76,7 +77,7 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
                    #"--split",'20',
                    ]
             print("Start Download ", download_url)
-            process = subprocess.Popen(
+            process = subprocess_cleanup.popen_in_cleanup_job(
                 cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
             _, stderr = process.communicate()
             if process.returncode != 0:
