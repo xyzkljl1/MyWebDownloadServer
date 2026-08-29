@@ -25,33 +25,44 @@ def Processor():
         queue=database.GetQueue()
 
         for (id, url, cookie, useragent, ignore_error) in queue:
-            try:
-                print('Try Start Task {0}:{1}'.format(id,url))
-                res = urllib.parse.urlparse(url)
-
-                if "nhentai" in res.hostname:
-                    dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
-                    success,msg=downloader_nhentai.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
-                elif "telegra.ph" in res.hostname:
-                    dir = "G:/DL_Pic/telegram_auto/org/"
-                    #dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
-                    success, msg = downloader_telegra.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, ignore_error)
-                elif "cosplaytele.com" in res.hostname:
-                    dir = "G:/DL_Pic/telegram_auto/org/"
-                    success, msg = downloader_cosplaytele.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
-                else:
-                    dir = os.path.join("E:/VideoDownload/", res.hostname.split('.')[-2])
-                    success,msg=downloader_youtubedl.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, id)
-                if success:
-                    database.RemoveRow(id)
-                else:
-                    database.UpdateRow(id,msg)
-            except Exception as e:
-                msg = f"{type(e).__name__}: {e}"
-                print('Task failed {0}:{1} {2}'.format(id,url,msg))
-                database.UpdateRow(id,msg)
+            ProcessTask(id, url, cookie, useragent, ignore_error)
         time.sleep(30)
 
+
+def ProcessTask(id, url, cookie, useragent, ignore_error, update_queue=True):
+    try:
+        success,msg=DownloadTask(id, url, cookie, useragent, ignore_error)
+        if update_queue:
+            if success:
+                database.RemoveRow(id)
+            else:
+                database.UpdateRow(id,msg)
+        return success,msg
+    except Exception as e:
+        msg = f"{type(e).__name__}: {e}"
+        print('Task failed {0}:{1} {2}'.format(id,url,msg))
+        if update_queue:
+            database.UpdateRow(id,msg)
+        return False,msg
+
+
+def DownloadTask(id, url, cookie, useragent, ignore_error):
+    print('Try Start Task {0}:{1}'.format(id,url))
+    res = urllib.parse.urlparse(url)
+
+    if "nhentai" in res.hostname:
+        dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
+        return downloader_nhentai.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
+    elif "telegra.ph" in res.hostname:
+        dir = "G:/DL_Pic/telegram_auto/org/"
+        #dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
+        return downloader_telegra.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, ignore_error)
+    elif "cosplaytele.com" in res.hostname:
+        dir = "G:/DL_Pic/telegram_auto/org/"
+        return downloader_cosplaytele.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
+    else:
+        dir = os.path.join("E:/VideoDownload/", res.hostname.split('.')[-2])
+        return downloader_youtubedl.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, id)
 
 class HTTPHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):

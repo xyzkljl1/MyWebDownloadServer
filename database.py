@@ -16,6 +16,19 @@ def GetQueue():
         print("Fail To Get Queue:", err)
     return queue
 
+def GetTask(id:int):
+    try:
+        conn=_Connect()
+        cursor=conn.cursor()
+        cursor.execute("select Id,URL,Cookie,UserAgent,IgnoreError from queue where Id={0}".format(id))
+        row=cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return row
+    except mysql.connector.Error as err:
+        print("Fail To Get Task:", err)
+    return None
+
 def InsertURL(url:str,cookie:str,useragent:str):
     try:
         conn = _Connect()
