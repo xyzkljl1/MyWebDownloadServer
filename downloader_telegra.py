@@ -4,10 +4,11 @@ import urllib.parse
 import re
 import requests
 import html.parser
-import locale
 import subprocess
 import subprocess_cleanup
 from PIL import Image
+
+UNRELIABLE_IMAGE_HOSTS = ("i.postimg.cc",)
 
 class MyHTMLParser(html.parser.HTMLParser):
     def __init__(self):
@@ -19,6 +20,20 @@ class MyHTMLParser(html.parser.HTMLParser):
             for pair in attrs:
                 if pair[0] == 'src':
                     self.data.append(pair[1])
+
+def CheckImageNotFound(url, proxy_a):
+    try:
+        response = requests.get(
+            url,
+            proxies={"http": proxy_a, "https": proxy_a},
+            timeout=20,
+            stream=True)
+        try:
+            return response.status_code == 404, str(response.status_code)
+        finally:
+            response.close()
+    except Exception as e:
+        return False, f"{type(e).__name__}: {e}"
 
 
 def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b,ignore_error=False):
@@ -38,6 +53,8 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b,ignore_error=Fal
         parser.close()
         ct=1
         fail_ct = 0
+        image_host_fail_ct = 0
+        all_unreliable_image_hosts = True
         sub_dir=os.path.join(dir,id)
         for p in parser.data:
             #有站内路径和站外路径两种
@@ -45,6 +62,12 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b,ignore_error=Fal
                 img_url = p
             else:
                 img_url = "https://telegra.ph"+p
+            img_host = urllib.parse.urlparse(img_url).hostname
+            if img_host:
+                img_host = img_host.lower()
+            is_unreliable_image_host = img_host in UNRELIABLE_IMAGE_HOSTS
+            if not is_unreliable_image_host:
+                all_unreliable_image_hosts = False
             ext = os.path.splitext(p)[1]
             filename = str(ct).zfill(4)+ext
             cmd = ["aria2c.exe", img_url,
@@ -60,9 +83,14 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b,ignore_error=Fal
             stdout, stderr = process.communicate()
             if process.returncode != 0:
                 # 有时候就是图床挂了或图片过期
-                msg=stderr.decode(locale.getpreferredencoding())
-                print('Fail on ', img_url, stdout, stderr, msg)
+                msg = "download fail"
+                print('Fail on ', img_url, msg)
                 fail_ct += 1
+                if is_unreliable_image_host:
+                    is_not_found, check_msg = CheckImageNotFound(img_url, proxy_a)
+                    msg = f"HTTP check {img_host}:{check_msg}"
+                    if is_not_found:
+                        image_host_fail_ct += 1
                 ct+=1
                 continue
             else:
@@ -81,7 +109,11 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b,ignore_error=Fal
             print("Almost Done", ct - 1 - fail_ct, ct - 1)
             return True, ""
         else:
-            return False,  f"Fail:{fail_ct}/{ct - 1} " + msg
+            total_ct = ct - 1
+            if (total_ct > 0 and fail_ct == total_ct and
+                    image_host_fail_ct == fail_ct and all_unreliable_image_hosts):
+                return False, f"Fail:{fail_ct}/{total_ct} Image Host Fail"
+            return False,  f"Fail:{fail_ct}/{total_ct} " + msg
     except Exception as e:
         msg = f"{type(e).__name__}: {e}"
         print("Download failed:", msg)
