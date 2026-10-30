@@ -137,3 +137,7 @@ www.*_cookies.txt
 
 # Local scratch files
 /test.py
+/debug_sql.py
+/MyDLChromeExt/
+AGENTS.md
+TODO.md

@@ -13,7 +13,7 @@ def Download(url, hostname, cookie, useragent, dir,proxy_a,proxy_b):
         id=res.path.split('/')[2]
         lib.nhentai.command.main('http://'+proxy_a, cookie, useragent, ["--id",id, "--format", "[%a](%i)%s", "-o", dir, "--no-html"])
         return True,""
-    except Exception as e:
+    except (Exception, SystemExit) as e:
         msg = f"{type(e).__name__}: {e}"
         print("Download failed:", msg)
         return False,msg
