@@ -60,6 +60,9 @@ def DownloadTask(id, url, cookie, useragent, ignore_error):
     elif "cosplaytele.com" in res.hostname:
         dir = "G:/DL_Pic/telegram_auto/org/"
         return downloader_cosplaytele.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
+    elif res.hostname in ("anime1.me", "www.anime1.me"):
+        import downloader_anime1
+        return downloader_anime1.Download(url, "E:/VideoDownload/anime1", useragent)
     else:
         dir = os.path.join("E:/VideoDownload/", res.hostname.split('.')[-2])
         return downloader_youtubedl.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, id)
@@ -86,7 +89,7 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
 
-    #HTTPServerÄ¬ÈÏ°ÑerrorºÍmessage¶¼Ğ´µ½stderr£¬·Ç³£¿Óµù
+    #HTTPServeré»˜è®¤æŠŠerrorå’Œmessageéƒ½å†™åˆ°stderrï¼Œéå¸¸å‘çˆ¹
     def log_error(self, format, *args):
         sys.stderr.write("%s - - [%s] %s\n" %
                          (self.address_string(),
