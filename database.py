@@ -57,3 +57,17 @@ def RemoveRow(id:int):
         conn.close()
     except mysql.connector.Error as err:
         print("Fail To Remove Row:", err)
+
+
+def GetNHentaiApiToken():
+    conn = _Connect()
+    try:
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT ApiToken FROM download_auth WHERE Site=%s", ("nhentai",))
+            row = cursor.fetchone()
+            return row[0] if row else ""
+        finally:
+            cursor.close()
+    finally:
+        conn.close()

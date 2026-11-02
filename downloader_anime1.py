@@ -125,10 +125,22 @@ class Client:
                 "Origin": "https://anime1.me", "Referer": episode.url}) as response:
             response.raise_for_status()
             sources = response.json().get("s", [])
-        # Multiple sources could be qualities or different videos; do not guess.
-        if len(sources) != 1 or not sources[0].get("src"):
-            raise ValueError("Expected exactly one video source")
-        url = urljoin(API_URL, sources[0]["src"])
+        # One episode can offer both streaming playlists and direct video files.
+        direct_sources = []
+        for source in sources:
+            if not source.get("src"):
+                continue
+            try:
+                _video_extension(source["src"], source.get("type", ""))
+            except ValueError:
+                continue
+            direct_sources.append(source)
+        if not direct_sources:
+            raise ValueError("No supported direct video source")
+        if len(direct_sources) != 1:
+            raise ValueError("Multiple direct video sources")
+        source = direct_sources[0]
+        url = urljoin(API_URL, source["src"])
         parts = urlsplit(url)
         host = parts.hostname or ""
         if (any(c in url for c in "\r\n") or parts.scheme != "https" or
@@ -139,7 +151,7 @@ class Client:
         cookie = prepared.headers.get("Cookie", "")
         if not cookie or any(c in cookie for c in "\r\n"):
             raise ValueError("Missing or invalid playback cookies")
-        return url, cookie, self.session.headers["User-Agent"], sources[0].get("type", "")
+        return url, cookie, self.session.headers["User-Agent"], source.get("type", "")
 
 
 def _episode(article, page_url):
