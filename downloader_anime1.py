@@ -374,12 +374,13 @@ def _download_episode(client, episode, output):
             time.sleep(1)
 
 
-def Download(url, dir, useragent=""):
+def Download(url, dir, useragent="", target_dir=None):
     client = Client(useragent)
     try:
         series = Discover(url, client)
-        folder = _checked_path(dir, _safe_name(series.title))
-        outputs = [_checked_path(dir, _safe_name(series.title), _safe_name(e.title))
+        folder = _checked_path(dir, os.path.relpath(target_dir, dir) if target_dir
+                               else _safe_name(series.title))
+        outputs = [_checked_path(dir, os.path.relpath(folder, dir), _safe_name(e.title))
                    for e in series.episodes]
         if len({p.casefold() for p in outputs}) != len(outputs):
             raise ValueError("Episode filenames collide")

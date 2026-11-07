@@ -36,7 +36,7 @@ def CheckImageNotFound(url, proxy_a):
         return False, f"{type(e).__name__}: {e}"
 
 
-def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b,ignore_error=False):
+def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b,ignore_error=False,target_dir=None):
     if not os.path.exists(dir):
         os.makedirs(dir)
     try:
@@ -55,7 +55,7 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b,ignore_error=Fal
         fail_ct = 0
         image_host_fail_ct = 0
         all_unreliable_image_hosts = True
-        sub_dir=os.path.join(dir,id)
+        sub_dir=target_dir or os.path.join(dir,id)
         for p in parser.data:
             #有站内路径和站外路径两种
             if p.startswith("http://") or p.startswith("https://"):

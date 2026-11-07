@@ -21,7 +21,7 @@ def main():
         print("Task not found:", task_id)
         return 1
 
-    success, msg = my_server.ProcessTask(*task, update_queue=False)
+    success, msg = my_server.ProcessTask(*task[:5], update_queue=False, target_dir=task[5])
     if success:
         print("Debug task success:", task_id)
         return 0

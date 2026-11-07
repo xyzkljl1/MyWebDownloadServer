@@ -1,3 +1,4 @@
+import os
 from types import SimpleNamespace
 from urllib.parse import urlsplit
 
@@ -21,7 +22,7 @@ class _Downloader(Downloader):
         return await super().save(filename, response)
 
 
-def Download(url, hostname, cookie, useragent, dir, proxy_a, proxy_b):
+def Download(url, hostname, cookie, useragent, dir, proxy_a, proxy_b, target_dir=None):
     try:
         gallery_id = urlsplit(url).path.split("/")[2]
         import database
@@ -36,6 +37,9 @@ def Download(url, hostname, cookie, useragent, dir, proxy_a, proxy_b):
         if meta is None:
             return False, "NHentai Could not parse gallery metadata"
         model = plugin.create_model(meta, name_format="[%a](%i)%s").doujinshi
+        if target_dir:
+            dir = os.path.dirname(target_dir)
+            model.filename = os.path.basename(target_dir)
         downloader = _Downloader()
         # The library caches Downloader instances; reset options for each task.
         downloader.__init__(path=dir, exit_on_fail=True)

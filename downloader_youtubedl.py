@@ -30,9 +30,10 @@ def Download(url, hostname, cookie, useragent, dir, proxy_a, proxy_b, id):
 注意命令行调用时，网址要加引号
 """
 def GetCmd(url:str,hostname,proxy_a,proxy_b, dir, id):
+    output_dir = dir.replace('%', '%%')
     cmd = [".\yt-dlp.exe",
             url,
-           "-o",f"{dir}\\%(title)s.%(ext)s",
+           "-o",f"{output_dir}\\%(title)s.%(ext)s",
            "--no-playlist",
            "--no-update",
            # 要使用yt-dlp构建的ffmpeg See https://github.com/yt-dlp/yt-dlp Readme Strongly recommended部分

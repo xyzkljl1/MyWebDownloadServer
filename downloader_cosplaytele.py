@@ -23,7 +23,7 @@ def ti(m):
     return a
 
 
-def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
+def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b,target_dir=None):
     tmp_dir=os.path.join(dir,"tmp")
     if not os.path.exists(dir):
         os.makedirs(dir)
@@ -85,7 +85,7 @@ def Download(url,hostname,cookie,useragent, dir,proxy_a,proxy_b):
                 return False, stderr.decode(locale.getpreferredencoding())
             print('Download Done')
             #解压
-            sub_dir = os.path.join(dir, title)
+            sub_dir = target_dir or os.path.join(dir, title)
             #7z的选项和参数间没有空格
             cmd = ["7z", "x",
                    filepath,

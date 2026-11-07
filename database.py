@@ -7,9 +7,9 @@ def GetQueue():
     try:
         conn=_Connect()
         cursor=conn.cursor()
-        cursor.execute("select Id,URL,Cookie,UserAgent,IgnoreError from queue where FailCount<20")
-        for (id,url,cookie,useragent,ignore_error) in cursor:
-            queue.append((id,url,cookie,useragent,ignore_error))
+        cursor.execute("select Id,URL,Cookie,UserAgent,IgnoreError,TargetDir from queue where FailCount<20")
+        for row in cursor:
+            queue.append(row)
         cursor.close()
         conn.close()
     except mysql.connector.Error as err:
@@ -20,7 +20,7 @@ def GetTask(id:int):
     try:
         conn=_Connect()
         cursor=conn.cursor()
-        cursor.execute("select Id,URL,Cookie,UserAgent,IgnoreError from queue where Id={0}".format(id))
+        cursor.execute("select Id,URL,Cookie,UserAgent,IgnoreError,TargetDir from queue where Id=%s", (id,))
         row=cursor.fetchone()
         cursor.close()
         conn.close()
@@ -29,14 +29,38 @@ def GetTask(id:int):
         print("Fail To Get Task:", err)
     return None
 
-def InsertURL(url:str,cookie:str,useragent:str):
+def InsertURL(url:str,cookie:str,useragent:str,relative_dir=None):
+    import download_paths
+
+    conn = cursor = None
     try:
         conn = _Connect()
-        conn.cmd_query("insert into queue(URL,Cookie,UserAgent) values('{0}','{1}','{2}') ".format(url,cookie,useragent))
-        conn.commit()
-        conn.close()
-    except mysql.connector.Error as err:
-        print("Fail To Add Task to Queue:", err)
+        cursor = conn.cursor()
+        suffix = 0
+        while True:
+            target = None
+            if relative_dir:
+                target = download_paths.candidate(url, relative_dir, suffix)
+                suffix += 1
+                if download_paths.occupied(target):
+                    continue
+            try:
+                cursor.execute(
+                    "INSERT INTO queue(URL,Cookie,UserAgent,TargetDir) VALUES(%s,%s,%s,%s)",
+                    (url, cookie, useragent or "", target))
+                conn.commit()
+                return cursor.lastrowid, target
+            except mysql.connector.IntegrityError as error:
+                conn.rollback()
+                # The unique index also reserves paths for concurrent requests.
+                if (target is None or error.errno != 1062 or
+                        "uq_queue_target_dir" not in str(error)):
+                    raise
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
 
 def UpdateRow(id:int,message:str):
     try:

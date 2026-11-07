@@ -26,7 +26,9 @@ CREATE TABLE IF NOT EXISTS `queue` (
   `FailMessage` varchar(10000) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
   `UserAgent` varchar(1000) COLLATE utf8_bin NOT NULL DEFAULT '',
   `IgnoreError` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`Id`)
+  `TargetDir` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci DEFAULT NULL,
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `uq_queue_target_dir` (`TargetDir`)
 ) ENGINE=InnoDB AUTO_INCREMENT=725 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE TABLE IF NOT EXISTS `download_auth` (

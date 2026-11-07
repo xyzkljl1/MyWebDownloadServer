@@ -1,4 +1,5 @@
 import os
+import json
 import http
 import http.server
 import sys
@@ -6,6 +7,7 @@ import urllib.parse
 import re
 import time
 import database
+import download_paths
 import _thread
 import downloader_youtubedl
 import downloader_nhentai
@@ -24,14 +26,14 @@ def Processor():
     while True:
         queue=database.GetQueue()
 
-        for (id, url, cookie, useragent, ignore_error) in queue:
-            ProcessTask(id, url, cookie, useragent, ignore_error)
+        for task in queue:
+            ProcessTask(*task[:5], target_dir=task[5])
         time.sleep(30)
 
 
-def ProcessTask(id, url, cookie, useragent, ignore_error, update_queue=True):
+def ProcessTask(id, url, cookie, useragent, ignore_error, update_queue=True, target_dir=None):
     try:
-        success,msg=DownloadTask(id, url, cookie, useragent, ignore_error)
+        success,msg=DownloadTask(id, url, cookie, useragent, ignore_error, target_dir=target_dir)
         if update_queue:
             if success:
                 database.RemoveRow(id)
@@ -46,48 +48,65 @@ def ProcessTask(id, url, cookie, useragent, ignore_error, update_queue=True):
         return False,msg
 
 
-def DownloadTask(id, url, cookie, useragent, ignore_error):
+def DownloadTask(id, url, cookie, useragent, ignore_error, target_dir=None):
     print('Try Start Task {0}:{1}'.format(id,url))
     res = urllib.parse.urlparse(url)
+    options = {}
+    if target_dir is not None:
+        target_dir = download_paths.validate_target(url, target_dir)
+        os.makedirs(target_dir, exist_ok=True)
+        download_paths.validate_target(url, target_dir)
+        options["target_dir"] = target_dir
 
     if "nhentai" in res.hostname:
         dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
-        return downloader_nhentai.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
+        return downloader_nhentai.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, **options)
     elif "telegra.ph" in res.hostname:
         dir = "G:/DL_Pic/telegram_auto/org/"
         #dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
-        return downloader_telegra.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, ignore_error)
+        return downloader_telegra.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, ignore_error, **options)
     elif "cosplaytele.com" in res.hostname:
         dir = "G:/DL_Pic/telegram_auto/org/"
-        return downloader_cosplaytele.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B)
+        return downloader_cosplaytele.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, **options)
     elif res.hostname in ("anime1.me", "www.anime1.me"):
         import downloader_anime1
-        return downloader_anime1.Download(url, "E:/VideoDownload/anime1", useragent)
+        return downloader_anime1.Download(url, "E:/VideoDownload/anime1", useragent, **options)
     else:
-        dir = os.path.join("E:/VideoDownload/", res.hostname.split('.')[-2])
+        dir = target_dir or os.path.join("E:/VideoDownload/", res.hostname.split('.')[-2])
         return downloader_youtubedl.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, id)
 
 class HTTPHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
-        if len(self.path)<=2:
+        try:
+            text = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query,
+                                        keep_blank_values=True)
+            url = urllib.parse.unquote(text.get('url', [''])[0])
+            cookie = urllib.parse.unquote(text.get('cookie', [''])[0])
+            useragent = self.headers.get('user-agent', '')
+            res = urllib.parse.urlparse(url)
+            if res.scheme not in ('http', 'https') or not res.hostname:
+                raise ValueError("A valid HTTP/HTTPS url is required")
+            if len(text.get('dir', [])) > 1:
+                raise ValueError("Only one dir parameter is allowed")
+            # parse_qs has already decoded dir; do not decode literal '%' twice.
+            relative_dir = text.get('dir', [''])[0] or None
+            task_id, target = database.InsertURL(url, cookie, useragent, relative_dir)
+        except ValueError as error:
+            self.send_error(400, str(error))
             return
-        text=self.path[2:]
-        text=urllib.parse.parse_qs(text)
-        if text.__contains__('url'):
-            url=urllib.parse.unquote(text['url'][0])
-        else:
+        except Exception as error:
+            print("Fail To Add Task to Queue:", error)
+            self.send_error(500, "Could not add download task")
             return
-        if text.__contains__('cookie'):
-            cookie=urllib.parse.unquote(text['cookie'][0])
-        else:
-            cookie=''
-        useragent=self.headers.get('user-agent')
-        res=urllib.parse.urlparse(url)
-        if res.scheme!='http' and res.scheme!='https':
-            return
-        database.InsertURL(url,cookie,useragent)
+        body = (json.dumps({"id": task_id, "target_dir": target}, ensure_ascii=False).encode('utf-8')
+                if target is not None else b'')
         self.send_response(200)
+        if body:
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.send_header('Content-Length', str(len(body)))
         self.end_headers()
+        if body:
+            self.wfile.write(body)
 
     #HTTPServer默认把error和message都写到stderr，非常坑爹
     def log_error(self, format, *args):
