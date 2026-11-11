@@ -12,7 +12,7 @@ def root_for_url(url):
     if "nhentai" in host:
         return os.path.abspath("G:/DL_Pic/nhentai")
     if "telegra.ph" in host or "cosplaytele.com" in host:
-        return os.path.abspath("G:/DL_Pic/telegram_auto/org")
+        return os.path.abspath("G:/PicsTmp/Telegram/org")
     return os.path.abspath("E:/VideoDownload")
 
 

@@ -62,11 +62,11 @@ def DownloadTask(id, url, cookie, useragent, ignore_error, target_dir=None):
         dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
         return downloader_nhentai.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, **options)
     elif "telegra.ph" in res.hostname:
-        dir = "G:/DL_Pic/telegram_auto/org/"
+        dir = "G:/PicsTmp/Telegram/org/"
         #dir = os.path.join("G:/DL_Pic/", res.hostname.split('.')[-2])
         return downloader_telegra.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, ignore_error, **options)
     elif "cosplaytele.com" in res.hostname:
-        dir = "G:/DL_Pic/telegram_auto/org/"
+        dir = "G:/PicsTmp/Telegram/org/"
         return downloader_cosplaytele.Download(url, res.hostname, cookie, useragent, dir, PROXY_A, PROXY_B, **options)
     elif res.hostname in ("anime1.me", "www.anime1.me"):
         import downloader_anime1
